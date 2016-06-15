@@ -15,7 +15,10 @@
 * 매일 조금씩이라도 하는걸 원칙으로 한다(small but sustainable)
 
 ### 보상
- * 매일 커밋을 함으로써 채워지는 contributions graph
+ * 매일 커밋을 함으로써 채워지는 contributions graph 의 뿌듯함
+ 
+### 페널티
+ * 한달 단위로 contributions graph에서 이빠진 날*1000원의 벌금
   
 ### TO READ
 
