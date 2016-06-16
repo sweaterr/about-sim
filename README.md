@@ -37,3 +37,6 @@
 * [word2vec Parameter Learning Explained](http://www-personal.umich.edu/~ronxin/pdf/w2vexp.pdf)
 * [Query2Vec: Learning Deep Intentions from Heterogenous Search Logs](http://www.cs.cmu.edu/~dongyeok/papers/query2vec_v0.2.pdf)
 * [Search Retargeting using Directed Query Embeddings](http://astro.temple.edu/~tua95067/grbovic2015wwwA.pdf)
+
+### tensorflow
+* https://github.com/aymericdamien/TensorFlow-Examples
