@@ -1,0 +1,380 @@
+<h2 id="deep-learning-for-chatbots-part-2-implementing-a-retrieval-based-model-in-tensorflow한글번역">DEEP LEARNING FOR CHATBOTS, PART 2 – IMPLEMENTING A RETRIEVAL-BASED MODEL IN TENSORFLOW(한글번역)</h2>
+
+<p>@[published]</p>
+
+<p>다음 <a href="http://www.wildml.com/2016/07/deep-learning-for-chatbots-2-retrieval-based-model-tensorflow/">포스트</a>를, 좀 더 자세히 읽으려는 공부목적으로 번역해보았습니다. </p>
+
+<p><a href="https://github.com/dennybritz/chatbot-retrieval/">The Code and data for this tutorial is on Github.</a></p>
+
+
+
+<h5 id="검색기반-봇-retrieval-based-bots">검색기반 봇 RETRIEVAL-BASED BOTS</h5>
+
+<p>이 포스트에서 검색기반 봇을 구현할 것이다. 검색 기반 모델은 이전에 보지 못했던 응답을 생성하는 생성모델과 달리 선-정의<sup>pre-define</sup>된 응답의 저장소이다.  좀 더 형식화하면, 검색 기반 모델의 입력은 문맥 <script type="math/tex" id="MathJax-Element-1">c</script>(이 시점까지 대화) 와 잠재적 응답 <script type="math/tex" id="MathJax-Element-2">r</script>  이다. 모델 출력은 응답에 대한 점수이다. 좋은 응답을 찾기 위해선, 여러 개의 응답에 대한 점수를 계산하고, 가장 높은 점수를 골라야 한다. 그러나, 생성모델을 만들 수 있다면, 왜 검색기반 모델을 만들어야 하는가? 선정의된 응답의 저장소가 필요없기 때문에, 생성 모델이 좀더 유연해보인다. </p>
+
+<p>문제는 생성모델은 최소한 아직까지는 실제에서는 잘 동작하지 않는다. 왜냐하면, 생성모델은 응답에 대한 자유가 커서, 문법적 실수를 하거나, 연관없고, 일반적이고, 일치하지 않는 응답을 하는 경향이 있다. 생성모델은 수많은 훈련 데이터가 필요하고, 최적화하기도 어렵다. 제품 시스템의 대부분은 검색-기반이거나 검색-기반과 생성모델의 결합이다.</p>
+
+<p>구글의 <a href="http://arxiv.org/abs/1606.04870">Smart Reply</a>가  좋은 예이다. 생성모델은 활발한 연구분야이지만, 아직 실용화단계까지는 가지 못했다. 당신이 대화형 에이전트를 만들기를 원한다면, 가장 좋은 방식은 검색-기반 모델일 확률이 높다.</p>
+
+<p>우분투 대화 코퍼스 THE UBUNTU DIALOG CORPUS <br>
+이 포스트에서는 Ubuntu Dialog Corpus로 일할 것이다. (<a href="http://arxiv.org/abs/1506.08909">paper</a>, <a href="https://github.com/rkadlec/ubuntu-ranking-dataset-creator">github</a>). </p>
+
+<p>Ubuntu Dialog Corpus (UDC) 는 이용가능한 가장 큰 공개 대화 데이터셋 중 하나이다. 공개 IRC 네트워크의 우분투 채널에서의 대화 로그를 기반으로 한다. 논문은 corpus가 어떻게 생성됐는지에 대해서 다룬다. 그래서 여기서는 다루지 않는다. 그러나, 어떤데이터를 다루게 되는지 이해하는 것은 중요하다. 약간의 탐험을 해보자. 훈련 데이터는 1,000,000 예제와 50% 긍정 (label 1) and 50% 부정 (label 0)으로 이루어져있다. 각 예제는 문맥과, 그 시점까지의 대화, 발언<sup>utterance</sup>, 문맥에 대한 응답으로 이루어져 있다.</p>
+
+<p>긍정은 발언이 실제 문맥에 대한 실제 응답이라는 의미이고, 부정은 틀렸다는 뜻이다. 부정은 코퍼스 내 어딘가에서 랜덤하게 뽑는다. 여기에 샘플 데이터가 있다.</p>
+
+<p><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-20-at-12.29.42-PM.png" alt="enter image description here" title=""></p>
+
+<p>데이터셋 생성 스크립트는 이미 많은 전처리를 해놓았다 - <a href="http://www.nltk.org/">NLTK</a>를 이용한  <a href="http://www.nltk.org/api/nltk.tokenize.html#module-nltk.tokenize">토크나이즈</a>, <a href="http://www.nltk.org/api/nltk.stem.html#module-nltk.stem.snowball">스테밍</a>, <a href="http://www.nltk.org/api/nltk.stem.html#module-nltk.stem.wordnet">렘마타이즈</a> -  스크립트는 이름, 위치. 기관, URL, 시스템 경로같은 엔티티를 특수 token으로 변환한다. 이 전처리는 꼭 필요하지는 않지만, 어느정도 성능 향샹을 할 수 있게 해준다. 평균 문맥 길이는 86단어이고 평균 발언 길이는 17 단어이다. <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/notebooks/Data%20Exploration.ipynb">데이터 분석을 보기 위해선 쥬피터 노트북을 확인하라.</a></p>
+
+<p>데이터에는 테스트와 검증셋이 딸려있다. 이것들의 포맷은 훈련 데이터의 포맷과는 다르다. 각 test/validation set의 각 레코드는 문맥, 정답 발언과 distractors로 불리는 9개의 틀린 발언으로 이루어져 있다. 모델의 목적은 정답 발언에 가장 높은 점수를 주고 틀린 발언에는 낮은 점수를 주는 것이다.</p>
+
+<p><img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-20-at-12.43.09-PM.png" alt="enter image description here" title=""></p>
+
+<p>모델이 얼마나 좋은지 평가하는 여러가지 방법이 있다. 주로 사용하는 방법은 recall@k이다. Recall@k는 모댈아 10개의 가능한 응답 중에 k개의 가장 좋은 응답을 고르게 한다. 정답 응답하나가 고른 것들 중에 있다면, 그 테스트 예제는 맞다고 표시한다. 그래서, k가 커진다는 것은 이 task가 쉬워진다는 것이다. 데이터셋에는 10개의 응답밖에 없기 때문에, k=10라면  100%의 recall을 얻는다. k=1이면, 모델은 정답 응답을 고를 단 한번의 기회밖에 없다.</p>
+
+<p>이 시점에서 어떻게 9 distractors를 골랐는지 궁금할 것이다. 이 데이터셋에서 9 distractors는 랜덤하게 골라졌다. 하지만, 실제 세계에서는 몇 백만개의 가능한 응답이 있을 수 있고, 어느것이 옳은 것인지 모른다. 가장 높은 점수의 응답을 고르기 위해 백만의 가능한 응답을 평가할 수 없다. 그 일은 너무 비싸다.</p>
+
+<p>Google’s Smart Reply uses clustering techniques to come up with a set of possible responses to choose from first.  구글의 Smart Reply는 가능한 응답의 집합을 얻기 위해 클러스터링 기법을 사용한다. 몇 백개의 가능한 응답이 있다면, 그것을 모두 평가할 수 있을 것이다.</p>
+
+
+
+<h5 id="baselines">BASELINES</h5>
+
+<p>뉴럴 네트워크 모델을 시작하기 전에, 어떤 종류의 성능을 원하는지 이해하기 위해 간단한 baseline 모델을 만들자. <code>recall@k</code> metric를 평가하기 위해 다음 함수를 사용할 것이다.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">evaluate_recall</span><span class="hljs-params">(y, y_test, k=<span class="hljs-number">1</span>)</span>:</span>
+    num_examples = float(len(y))
+    num_correct = <span class="hljs-number">0</span>
+    <span class="hljs-keyword">for</span> predictions, label <span class="hljs-keyword">in</span> zip(y, y_test):
+        <span class="hljs-keyword">if</span> label <span class="hljs-keyword">in</span> predictions[:k]:
+            num_correct += <span class="hljs-number">1</span>
+    <span class="hljs-keyword">return</span> num_correct/num_examples</code></pre>
+
+<p><code>y</code>는 내림차순으로 정렬된 예측의 리스트이다. <code>y_test</code>는 실제 레이블이다. 예를 들어,  <code>[0,3,1,2,5,6,4,7,8,9]</code> 의 <code>y</code> 는 발언 0이 가장 높은 점수를 얻었고, 발언 9가 낮은 점수를 얻었다는 의미이다. 각 테스트 예제에 대해서 10개의 발언를 가졌고, 첫번째 (index 0)은 항상 정답이다. 왜냐하면 발언 column은 distractor columns 앞에 오기 때문이다. 직관적으로, 완전 랜덤 예측기는 <code>recall@1</code>에 대해서 10%를 얻고, <code>recall@2</code>는 20%를 얻는다. 이 것이 사실인지 보자.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-comment"># Random Predictor</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict_random</span><span class="hljs-params">(context, utterances)</span>:</span>
+    <span class="hljs-keyword">return</span> np.random.choice(len(utterances), <span class="hljs-number">10</span>, replace=<span class="hljs-keyword">False</span>)
+<span class="hljs-comment"># Evaluate Random predictor</span>
+y_random = [predict_random(test_df.Context[x], test_df.iloc[x,<span class="hljs-number">1</span>:].values) <span class="hljs-keyword">for</span> x <span class="hljs-keyword">in</span> range(len(test_df))]
+y_test = np.zeros(len(y_random))
+<span class="hljs-keyword">for</span> n <span class="hljs-keyword">in</span> [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]:
+    print(<span class="hljs-string">"Recall @ ({}, 10): {:g}"</span>.format(n, evaluate_recall(y_random, y_test, n)))</code></pre>
+
+
+
+<pre class="prettyprint"><code class=" hljs python">Recall <span class="hljs-decorator">@ (1, 10): 0.0937632</span>
+Recall <span class="hljs-decorator">@ (2, 10): 0.194503</span>
+Recall <span class="hljs-decorator">@ (5, 10): 0.49297</span>
+Recall <span class="hljs-decorator">@ (10, 10): 1</span></code></pre>
+
+<p>좋다. 잘 동작하는 것처럼 보인다. 물론, 우리가 랜덤 예측기를 원하는 것은 아니다. 원 논문에서 논의한 다른 baseline은 tf-idf 예측기이다. <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">tf-idf</a> 는 “term frequency – inverse document frequency”를 의미하고, 문서에서의 단어가 전체 문서집합에서 상대적으로 얼마나 중요한지를 측정한다. 자세한 사항은 논외로 하고, 비슷한 내용을 가진 문서는 비슷한 tf-idf 벡터를 가질 것이다. </p>
+
+<p>직관적으로, 문맥과 응답이 비슷한 단어를 가지고 있다면, 그 둘은 올바른 쌍일 가능성이 크다. 최소한 랜덤보다는 가능성이 높다. (<a href="http://scikit-learn.org/">scikit-learn</a> 같은) 많은 라이브러리는 내장 tf-idf 함수가 딸려있다. 매우 쓰기 쉽다. tf-idf 예측기를 만들고 얼마나 잘 동작하는지 보자.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">TFIDFPredictor</span>:</span>
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">__init__</span><span class="hljs-params">(self)</span>:</span>
+        self.vectorizer = TfidfVectorizer()
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">train</span><span class="hljs-params">(self, data)</span>:</span>
+        self.vectorizer.fit(np.append(data.Context.values,data.Utterance.values))
+
+    <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">predict</span><span class="hljs-params">(self, context, utterances)</span>:</span>
+        <span class="hljs-comment"># Convert context and utterances into tfidf vector</span>
+        vector_context = self.vectorizer.transform([context])
+        vector_doc = self.vectorizer.transform(utterances)
+        <span class="hljs-comment"># The dot product measures the similarity of the resulting vectors</span>
+        result = np.dot(vector_doc, vector_context.T).todense()
+        result = np.asarray(result).flatten()
+        <span class="hljs-comment"># Sort by top results and return the indices in descending order</span>
+        <span class="hljs-keyword">return</span> np.argsort(result, axis=<span class="hljs-number">0</span>)[::-<span class="hljs-number">1</span>]</code></pre>
+
+
+
+<pre class="prettyprint"><code class=" hljs avrasm"><span class="hljs-preprocessor"># Evaluate TFIDF predictor</span>
+pred = TFIDFPredictor()
+pred<span class="hljs-preprocessor">.train</span>(train_df)
+<span class="hljs-built_in">y</span> = [pred<span class="hljs-preprocessor">.predict</span>(test_df<span class="hljs-preprocessor">.Context</span>[<span class="hljs-built_in">x</span>], test_df<span class="hljs-preprocessor">.iloc</span>[<span class="hljs-built_in">x</span>,<span class="hljs-number">1</span>:]<span class="hljs-preprocessor">.values</span>) for <span class="hljs-built_in">x</span> <span class="hljs-keyword">in</span> range(len(test_df))]
+for n <span class="hljs-keyword">in</span> [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]:
+    print(<span class="hljs-string">"Recall @ ({}, 10): {:g}"</span><span class="hljs-preprocessor">.format</span>(n, evaluate_recall(<span class="hljs-built_in">y</span>, y_test, n)))</code></pre>
+
+
+
+<pre class="prettyprint"><code class=" hljs python">Recall <span class="hljs-decorator">@ (1, 10): 0.495032</span>
+Recall <span class="hljs-decorator">@ (2, 10): 0.596882</span>
+Recall <span class="hljs-decorator">@ (5, 10): 0.766121</span>
+Recall <span class="hljs-decorator">@ (10, 10): 1</span></code></pre>
+
+<p>tf-idf 모델은 랜덤모델보다 매우 낫다. 하지만 완벽하지는 않다. tfidf 모델의 가장은 그렇게 좋지는 않다. 무엇보다도, 응답이 정답이기 위해서 꼭 문맥과 비슷할 필요는 없다. 둘째로, tf-idf는 중요한 신호가 될 수 있는 단어 순서를 무시한다. 뉴럴네트워크 모델과 함께라면, 좀 더 그 일을 잘할 수 있다.</p>
+
+
+
+<h5 id="dual-encoder-lstm">DUAL ENCODER LSTM</h5>
+
+<p>이 포스트에서 우리가 만들 딥러닝 모델은 Dual Encoder LSTM network라 불린다. 이 타입의 네트워크는 이 문제에 적용할 수 있는 많은 모델 중 하나이며, 반드시 가장 좋은 것은 아니다. 당신은 아직 시도해보지 못한 모든 종류의 딥러닝 구조를 생각해 볼 수 있다. - 그것은 매우 활발한 연구 분야이다. 예를 들어, 기계 번역 분야에서 자주 쓰이는 <a href="https://www.tensorflow.org/versions/r0.9/tutorials/seq2seq/index.html">seq2seq</a>은 이 문제에 아마도 잘 맞을 것이다.</p>
+
+<p>Dual Encoder를 다루는 이유는 이 데이터셋에 대해서 매우 잘 동작한다고 <a href="http://arxiv.org/abs/1510.03753">보고</a>  되었기 때문이다. 이것은  우리가 기대하는 것이고 우리의 구현이 틀리지 않았음을 확신할수도 있다. 이 문제에 대한 다른 모델의 적용은 흥미로운 프로젝트이다. 우리가 만들 Dual Encoder LSTM는 이와 같다. <br>
+<img src="http://d3kbpzbmcynnmx.cloudfront.net/wp-content/uploads/2016/04/Screen-Shot-2016-04-21-at-10.51.18-AM.png" alt="enter image description here" title=""></p>
+
+<p>이 모델은 대충 이렇게 동작한다.</p>
+
+<ol>
+<li><p>문맥과 응답 텍스트 모두 단어로 나뉜다. 각 단어는 벡터로 임베딩된다. 워드 임베딩은 스탠포드의 GloVe vectors로 초기화 되고 훈련기간동안 fine-tuned된다 (이 과정은 선택사항이며, 그림에는 보여져 있지 않다. 필자는 Glove의 단어 임베딩을 사용하는 것은 모델 성능에는 별로 영향을 끼치지 않는다는 것을 발견했다)</p></li>
+<li><p>임베딩된 문백과 응답 모두 같은 Recurrent Neural Network에 단어별로 주입된다. RNN은 벡터 표현을 생성한다. 대충 말하자면, 문맥과 응답의 의미를 잡는다(그림에서 <script type="math/tex" id="MathJax-Element-3">c</script>와 <script type="math/tex" id="MathJax-Element-4">r'</script>). 얼마나 큰 벡터를 사용할 것인지는 고를 수 있다. 여기서는 256 차원이다.</p></li>
+<li><p>응답 <script type="math/tex" id="MathJax-Element-5">r</script>에 대한 “예측”을 하기 위해 행렬 <script type="math/tex" id="MathJax-Element-6">M</script>에 <script type="math/tex" id="MathJax-Element-7">c</script>를 곱한다. <script type="math/tex" id="MathJax-Element-8">c</script>가 256차원 벡터이면,  <script type="math/tex" id="MathJax-Element-9">M</script>은 256×256 차원 행렬이고, 결과는 다른 256차원 벡터이다. 그 결과 벡터는 생성된 응답으로 해석할 수 있다. <script type="math/tex" id="MathJax-Element-10">M</script>은 훈련시간에 학습된다.</p></li>
+<li><p>두 벡터의 내적을 취함으로써, 예측된 응답 <script type="math/tex" id="MathJax-Element-11">r'</script>와 실제 응답 <script type="math/tex" id="MathJax-Element-12">r</script> 사이의 유사도를 측정한다. 큰 내적은 벡터가 유사하고 응답은 높은 점수를 얻는다. 스코어를 확률로 바꾸기 위해, sigmoid함수를 적용한다. 3, 4 단계는 그림에서 서로 결합되어 있음을 주시하라.</p></li>
+</ol>
+
+<p>네트워크를 훈련하기 위해, 손실(비용) 함수가 필요하다. 분류문제에 흔히 쓰이는 binary cross-entropy loss를 사용할 것이다. <br>
+문맥-응답 쌍에 대한 정답 레이블을  <code>y</code>라 부르자. 1 (actual response) 또는  0 (incorrect response)이 될 수 있다. 4에서 예측 확률을 <code>y'</code>라 하자.  그 후, cross entropy loss는 <code>L= −y * ln(y') − (1 − y) * ln(1−y)</code>로 계산된다. 이 식 뒤에 있는 직관은 쉽다. <code>y=1</code>이면 <code>L = -ln(y')</code>만 남고, 1에서 멀어진 예측에 대한 페널티를 받는다. <code>y=0</code>이면 <code>L= −ln(1−y)</code>만 남고 0에서 멀어진 것에 대한 페널티를 받는다. 여기서 구현에서는 numpy, pandas, Tensorflow, TF Learn(텐서플로우의 고레벨의 수준의 라이브러리)의 조합을 사용한다.</p>
+
+
+
+<h5 id="data-preprocessing">DATA PREPROCESSING</h5>
+
+<p>데이터셋은 원래 CSV 포맷으로 되어 있다. </p>
+
+<p>We could work directly with CSVs, but it’s better to convert our data into Tensorflow’s proprietary Example format. (Quick side note: There’s also tf.SequenceExample but it doesn’t seem to be supported by tf.learn yet).  <br>
+CSV로 작업할수도 있지만, 텐서플로우의 독점 <a href="https://github.com/tensorflow/tensorflow/blob/master/tensorflow/core/example/example.proto">예제</a> 포맷을 사용하는것이 더 낫다(Quick side note: There’s also <code>tf.SequenceExample</code> but it doesn’t seem to be supported by tf.learn yet). 입력 파일에서 바로 텐서를 읽을 수 있고 텐서플로우가, 입력의셔플링, 배칭, 큐잉을 할수 있게 해준다. 또한, 전처리의 부분으로써, vocabulary를 생성한다. 이는 각 단어를 정수 숫자에 매핑하는 것을 의미한다. 예를 들어 “cat”은 <code>2631</code>이 될 수 있다. 생성할 <code>TFRecord</code> 파일은 단어 스트링 대신 이 정수 숫자를 저장한다. 또한 정수에서, 단어로 다시 매핑할 수 있는 단어집도 저장한다.</p>
+
+<p>각 <code>Example</code>는 다음 필드를 포함한다.</p>
+
+<p><code>context</code>: 문맥 텍스트를 표현하는 단어 id의 순서 e.g. <code>[231, 2190, 737, 0, 912]</code> <br>
+<code>context_len</code>: The length of the context, e.g. 5 for the above example <br>
+<code>context_len</code>: 문맥의 길이  e.g.  위의 예에서 <code>5</code> <br>
+<code>utterance</code> 발언 텍스트를 표현하는 단어 id의 순서 (response) <br>
+<code>utterance_len</code>: 발언의 길이 <br>
+<code>label</code>:  훈련셋에만 있다.  0 or 1. <br>
+<code>distractor_[N]</code>: the test/validation data에만 있다.  <code>N</code> 은 0~8까지 있다.  발언을 표현하는 단어 ids의 순서 <br>
+<code>distractor_[N]_len</code>: distractor utterance의 길이</p>
+
+<p>전처리는 <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/scripts/prepare_data.py">prepare_data.py</a> 에서 처리된다. 3개의 파일 <code>train.tfrecords</code>, <code>validation.tfrecords</code> , <code>test.tfrecords</code>이 만들어진다. 당신이 직집 이 스크립트를 <a href="https://drive.google.com/open?id=0B_bZck-ksdkpVEtVc1R6Y01HMWM">다운로드</a>하여 수행해볼수 있다.</p>
+
+
+
+<h5 id="creating-an-input-function">CREATING AN INPUT FUNCTION</h5>
+
+<p>훈련과 평가에 대한 텐서플로우의 내장 지원을 사용하기 위해, 텐서플로우의 (입력 데이터의 배치를 리턴하는) 입력 함수를 생성해야한다.  사실, 훈련과 테스트는 다른 포맷이기 때문에, 각각에 대한 다른 입력함수가 필요하다. 입력 함수는 피쳐와 레이블(가능하면)의 배치를 리턴해야한다. Something along the lines of:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">input_fn</span><span class="hljs-params">()</span>:</span>
+  <span class="hljs-comment"># TODO Load and preprocess data here</span>
+  <span class="hljs-keyword">return</span> batched_features, labels</code></pre>
+
+<p>훈련과 평가동안 다른 입력함수가 필요하기 때문에 그리고 코드 중복을 증오하기 때문에, 적절한 모드에 대한 입력함수를 생성하는 <code>create_input_fn</code>라 불리는 wrapper를 만든다. It also takes a few other parameters. Here’s the definition we’re using:</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_input_fn</span><span class="hljs-params">(mode, input_files, batch_size, num_epochs=None)</span>:</span>
+  <span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">input_fn</span><span class="hljs-params">()</span>:</span>
+    <span class="hljs-comment"># TODO Load and preprocess data here</span>
+    <span class="hljs-keyword">return</span> batched_features, labels
+  <span class="hljs-keyword">return</span> input_fn</code></pre>
+
+<p>전체 코드는 <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_inputs.py">udc_inputs.py</a>에 있다. 고레벨에서는 함수는 다음과 같은 일을 한다.</p>
+
+<ol>
+<li><code>Example</code> 파일의 필드를 설명하는 feature 정의를 만든다.</li>
+<li><code>tf.TFRecordReader</code>로  <code>input_files</code>로부터 레코드를 읽는다</li>
+<li>feature 정의에 따라 레코드를 파싱한다.</li>
+<li>훈련 레이블을 추출한다.</li>
+<li>다수의 예제와 훈련 레이블을 배치로 나눈다.</li>
+<li>배치로 나뉜 예제와 훈련레이블을 리턴한다.</li>
+</ol>
+
+
+
+<h5 id="defining-evaluation-metrics">DEFINING EVALUATION METRICS</h5>
+
+<p>모델을 평가하기 위해 <code>recall@k</code> metric를 사용하기를 원한다는 것을 이미 언급했다. 운이 좋게도, 텐서플로우는 <code>recall@k</code>를 포함한 표준 평가 메트릭들이 딸려있다. 이 메트릭을 사용하기 위해, 메트릭 이름을 예측치와 정답 레이블을 인자로 받는 함수로 매핑하는 dictionary를 생성한다.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs python"><span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">create_evaluation_metrics</span><span class="hljs-params">()</span>:</span>
+  eval_metrics = {}
+  <span class="hljs-keyword">for</span> k <span class="hljs-keyword">in</span> [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">5</span>, <span class="hljs-number">10</span>]:
+    eval_metrics[<span class="hljs-string">"recall_at_%d"</span> % k] = functools.partial(
+        tf.contrib.metrics.streaming_sparse_recall_at_k,
+        k=k)
+  <span class="hljs-keyword">return</span> eval_metrics</code></pre>
+
+<p>위 코드에서 3개의 인자를 받는 함수를 2개의 인자를 받는 함수로 변환하는 <a href="https://docs.python.org/2/library/functools.html#functools.partial">functools.partial</a>를 사용한다. <code>streaming_sparse_recall_at_k</code>이름에 헷갈려하지 마라. Streaming은 단지, 여러 개의 배치에 대해서 쌓인다는 의미이고 sparse는 레이블의 포맷을 말한다.</p>
+
+<p>이는 중요한 점을 시사한다. 평가 시간동안, 예측의 정확한 포맷은 무엇인가? 학습시간 동안, 예제가 정답일 확률을 예측한다. 그러나, 평가 시간에는, 목표는 발언과 9개의 distractors에 대해서 점수를 매기고, 가장 좋은 것을 고른다 - 단지 정답/틀림을 예측하는것이 아닌다. 이는 평가 시간에, 각 예제는 <code>[0.34, 0.11, 0.22, 0.45, 0.01, 0.02, 0.03, 0.08, 0.33, 0.11]</code>같은 10개 점수의 벡터를 출력해야 한다는 것이다. 각 점수는 정답 응답과 9개의 distractors에 대응한다. 각 발언은 독립적으로 점수가 매겨지므로, 확률은 합이 1일 필요는 없다. 정답 응답은 항상 배열에서 0번째 있기 때문에, 각 예제에 대한 레이블은 0이다. 정답 응답에 대해서는 0.34를 받은 반면, 세번째 distractor가 0.45의 확률을 얻었으므로,  <code>recall@1</code>에 의해서는 이 예제는 틀렸다. <code>recall@2</code>에 의해서는 이 예제는 정답이다.</p>
+
+
+
+<h3 id="학습-코드를-표준화하기boilerplate-training-code">학습 코드를 표준화하기(BOILERPLATE TRAINING CODE )</h3>
+
+<p>뉴럴 네트워크 코드를 작성하기 전에, 모델을 학습하고 평가하는 것을 표준화한 코드를 작성하겠다. 이는 올바른 인터페이스를 유지하는 한, 당신이 사용할 네트워크를 교체하기 쉽게 해준다. 입력으로 배치화된 피쳐, 레이블, 모드(훈련 또는 평가)를 받고 예측을 출력하는 모델 함수 <code>model_fn</code>를 가정하자.  그 후, 다음과 같이 모델을 훈련하는 일반적 목적의 코드를 작성할 수 있다.</p>
+
+
+
+<pre class="prettyprint"><code class="language-python hljs ">estimator = tf.contrib.learn.Estimator(
+model_fn=model_fn,
+model_dir=MODEL_DIR,
+config=tf.contrib.learn.RunConfig())
+
+input_fn_train = udc_inputs.create_input_fn(
+mode=tf.contrib.learn.ModeKeys.TRAIN,
+input_files=[TRAIN_FILE],
+batch_size=hparams.batch_size)
+
+input_fn_eval = udc_inputs.create_input_fn(
+mode=tf.contrib.learn.ModeKeys.EVAL,
+input_files=[VALIDATION_FILE],
+batch_size=hparams.eval_batch_size,
+num_epochs=<span class="hljs-number">1</span>)
+
+eval_metrics = udc_metrics.create_evaluation_metrics()
+
+<span class="hljs-comment"># We need to subclass theis manually for now. The next TF version will</span>
+<span class="hljs-comment"># have support ValidationMonitors with metrics built-in.</span>
+<span class="hljs-comment"># It's already on the master branch.</span>
+<span class="hljs-class"><span class="hljs-keyword">class</span> <span class="hljs-title">EvaluationMonitor</span><span class="hljs-params">(tf.contrib.learn.monitors.EveryN)</span>:</span>
+<span class="hljs-function"><span class="hljs-keyword">def</span> <span class="hljs-title">every_n_step_end</span><span class="hljs-params">(self, step, outputs)</span>:</span>
+  self._estimator.evaluate(
+    input_fn=input_fn_eval,
+    metrics=eval_metrics,
+    steps=<span class="hljs-keyword">None</span>)
+
+eval_monitor = EvaluationMonitor(every_n_steps=FLAGS.eval_every)
+estimator.fit(input_fn=input_fn_train, steps=<span class="hljs-keyword">None</span>, monitors=[eval_monitor])</code></pre>
+
+<p>여기서 <code>model_fn</code>에 대한 estimator를 생성한다. 훈련과 평가에 대한 두 입력 함수, 평가 메트릭 사전을 입력으로 받는다. 훈련기간동안 <code>FLAGS.eval_every</code> 단계마다 모델을 평가하는 monitor를 정의한다. 마침내, 모델을 학습한다. 학습은 막연하게 수행되지만, 텐서플로우는 <code>MODEL_DIR</code>에 체크포인트 파일을 자동적으로 저장한다. 그래서 당신은 훈련을 언제든 중단할 수 있다. 좀 더 fancy한 테크닉은 검수셋 메트릭이 더 나아지지 않을 때(오버피팅이 시작될 때)자동적으로 학습을 중단하는 early stopping를 쓰는 것이다. 전체 코드는  <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_train.py">udc_train.py</a>.</p>
+
+<p>간단하게 언급하고자 하는 것은 <code>FLAGS</code>의 사용법이다. 이는 파이썬 <code>argparse</code>와 비슷하게 프로그래에 커맨드라인 파라메터을 주는 방법이다. <code>hparams</code>는 모델을 튜닝할 수 있는 하이퍼파라메터를 저장하는 <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_hparams.py">hparams.py</a> 에 만든 커스텀 객체이다. 이 <code>hparams</code> object 는 모델을 인스턴스화할 때 주어진다.</p>
+
+
+
+<h5 id="creating-the-model">CREATING THE MODEL</h5>
+
+<p>입력, 파싱, 평가, 훈련에 대한 표준화한 코드를 만들었으므로,  Dual LSTM neural network에 대한 코드를 작성할 시간이다.훈련과 평가에 대해서 서로 다른 포맷을 가지고 있기 때문에, 데이터를 올바른 포맷으로 가져오는 일을 하는  <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_model.py"><code>create_model_fn</code></a> 래퍼를 작성했다. 실제 예측을 하는 <code>model_impl</code>를 인자로 받는다. 우리의 경우에는,  예측은 위에서 설명한 Dual Encoder LSTM가 한다. 하지만  다른 뉴럴 네트워크로 쉽게 교체할 수있다. 어떻게 생겼는지 보자.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs avrasm">def dual_encoder_model(
+    hparams,
+    mode,
+    context,
+    context_len,
+    utterance,
+    utterance_len,
+    targets):
+
+  <span class="hljs-preprocessor"># Initialize embedidngs randomly or with pre-trained vectors if available</span>
+  embeddings_W = get_embeddings(hparams)
+
+  <span class="hljs-preprocessor"># Embed the context and the utterance</span>
+  context_embedded = tf<span class="hljs-preprocessor">.nn</span><span class="hljs-preprocessor">.embedding</span>_lookup(
+      embeddings_W, context, name=<span class="hljs-string">"embed_context"</span>)
+  utterance_embedded = tf<span class="hljs-preprocessor">.nn</span><span class="hljs-preprocessor">.embedding</span>_lookup(
+      embeddings_W, utterance, name=<span class="hljs-string">"embed_utterance"</span>)
+
+
+  <span class="hljs-preprocessor"># Build the RNN</span>
+  with tf<span class="hljs-preprocessor">.variable</span>_scope(<span class="hljs-string">"rnn"</span>) as vs:
+    <span class="hljs-preprocessor"># We use an LSTM Cell</span>
+    cell = tf<span class="hljs-preprocessor">.nn</span><span class="hljs-preprocessor">.rnn</span>_cell<span class="hljs-preprocessor">.LSTMCell</span>(
+        hparams<span class="hljs-preprocessor">.rnn</span>_dim,
+        forget_bias=<span class="hljs-number">2.0</span>,
+        use_peepholes=True,
+        state_is_tuple=True)
+
+    <span class="hljs-preprocessor"># Run the utterance and context through the RNN</span>
+    rnn_outputs, rnn_states = tf<span class="hljs-preprocessor">.nn</span><span class="hljs-preprocessor">.dynamic</span>_rnn(
+        cell,
+        tf<span class="hljs-preprocessor">.concat</span>(<span class="hljs-number">0</span>, [context_embedded, utterance_embedded]),
+        sequence_length=tf<span class="hljs-preprocessor">.concat</span>(<span class="hljs-number">0</span>, [context_len, utterance_len]),
+        dtype=tf<span class="hljs-preprocessor">.float</span>32)
+    encoding_context, encoding_utterance = tf<span class="hljs-preprocessor">.split</span>(<span class="hljs-number">0</span>, <span class="hljs-number">2</span>, rnn_states<span class="hljs-preprocessor">.h</span>)
+
+  with tf<span class="hljs-preprocessor">.variable</span>_scope(<span class="hljs-string">"prediction"</span>) as vs:
+    M = tf<span class="hljs-preprocessor">.get</span>_variable(<span class="hljs-string">"M"</span>,
+      shape=[hparams<span class="hljs-preprocessor">.rnn</span>_dim, hparams<span class="hljs-preprocessor">.rnn</span>_dim],
+      initializer=tf<span class="hljs-preprocessor">.truncated</span>_normal_initializer())
+
+    <span class="hljs-preprocessor"># "Predict" a  response: c * M</span>
+    generated_response = tf<span class="hljs-preprocessor">.matmul</span>(encoding_context, M)
+    generated_response = tf<span class="hljs-preprocessor">.expand</span>_dims(generated_response, <span class="hljs-number">2</span>)
+    encoding_utterance = tf<span class="hljs-preprocessor">.expand</span>_dims(encoding_utterance, <span class="hljs-number">2</span>)
+
+    <span class="hljs-preprocessor"># Dot product between generated response and actual response</span>
+    <span class="hljs-preprocessor"># (c * M) * r</span>
+    logits = tf<span class="hljs-preprocessor">.batch</span>_matmul(generated_response, encoding_utterance, True)
+    logits = tf<span class="hljs-preprocessor">.squeeze</span>(logits, [<span class="hljs-number">2</span>])
+
+    <span class="hljs-preprocessor"># Apply sigmoid to convert logits to probabilities</span>
+    probs = tf<span class="hljs-preprocessor">.sigmoid</span>(logits)
+
+    <span class="hljs-preprocessor"># Calculate the binary cross-entropy loss</span>
+    losses = tf<span class="hljs-preprocessor">.nn</span><span class="hljs-preprocessor">.sigmoid</span>_cross_entropy_with_logits(logits, tf<span class="hljs-preprocessor">.to</span>_float(targets))
+
+  <span class="hljs-preprocessor"># Mean loss across the batch of examples</span>
+  mean_loss = tf<span class="hljs-preprocessor">.reduce</span>_mean(losses, name=<span class="hljs-string">"mean_loss"</span>)
+  return probs, mean_loss</code></pre>
+
+<p>전체 코드는 <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/models/dual_encoder.py">dual_encoder.py</a>에 있다. 이것이 주어지면, 이전에 정의한 <a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_train.py">udc_train.py</a>에 있는 main routine의 model function을 인스턴스화할 수 있다.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs fix"><span class="hljs-attribute">model_fn </span>=<span class="hljs-string"> udc_model.create_model_fn(
+  hparams=hparams,
+  model_impl=dual_encoder_model)</span></code></pre>
+
+<p>됐다!.  <code>udc_train.py</code>를 실행할 수 있고, 네트워크를 훈련하며, 때때로, 검수 데이터에 대한 recall을 평가한다(<code>--eval_every</code>를 바꿈으로써 주기를 조절할 수 있다). <code>tf.flags</code>와 <code>hparams</code>를 사용하는 정의된 사용가능한 모든 command line flags를 얻기 위해서 <code>python udc_train.py --help</code>를 실행해라</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs r">INFO:tensorflow:training step <span class="hljs-number">20200</span>, loss = <span class="hljs-number">0.36895</span> (<span class="hljs-number">0.330</span> sec/batch).
+INFO:tensorflow:Step <span class="hljs-number">20201</span>: mean_loss:<span class="hljs-number">0</span> = <span class="hljs-number">0.385877</span>
+INFO:tensorflow:training step <span class="hljs-number">20300</span>, loss = <span class="hljs-number">0.25251</span> (<span class="hljs-number">0.338</span> sec/batch).
+INFO:tensorflow:Step <span class="hljs-number">20301</span>: mean_loss:<span class="hljs-number">0</span> = <span class="hljs-number">0.405653</span>
+<span class="hljs-keyword">...</span>
+INFO:tensorflow:Results after <span class="hljs-number">270</span> steps (<span class="hljs-number">0.248</span> sec/batch): recall_at_1 = <span class="hljs-number">0.507581018519</span>, recall_at_2 = <span class="hljs-number">0.689699074074</span>, recall_at_5 = <span class="hljs-number">0.913020833333</span>, recall_at_10 = <span class="hljs-number">1.0</span>, loss = <span class="hljs-number">0.5383</span>
+<span class="hljs-keyword">...</span></code></pre>
+
+
+
+<h5 id="evaluating-the-model">EVALUATING THE MODEL</h5>
+
+<p>모델을 학습한 후, <code>python udc_test.py --model_dir=$MODEL_DIR_FROM_TRAINING,</code>를 사용해서 모델을 평가할 수 있다. e.g. <code>python udc_test.py --model_dir=~/github/chatbot-retrieval/runs/1467389151.</code> 검수셋 대신에, 테스트셋에 대한 <code>recall@k</code> 평가 메트릭을 실행할 수 있을 것이다. 훈련 기간 중에 사용된 같은 파라메터로 <code>udc_test.py</code>를 수행해야한다. <code>--embedding_size=128</code>로 학습했다면, 같은 것로 테스트 스크립트를 호출해야한다.</p>
+
+<p>After training for about 20,000 steps (around an hour on a fast GPU) our model gets the following results on the test set: <br>
+빠른 GPU에서 한시간 정도 걸리는, 대략 20,000 스텝의 훈련 후, 모델은  테스트셋에 대해서 다음 결과를 내놓는다.</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs ini"><span class="hljs-setting">recall_at_1 = <span class="hljs-value"><span class="hljs-number">0.507581018519</span></span></span>
+<span class="hljs-setting">recall_at_2 = <span class="hljs-value"><span class="hljs-number">0.689699074074</span></span></span>
+<span class="hljs-setting">recall_at_5 = <span class="hljs-value"><span class="hljs-number">0.913020833333</span></span></span></code></pre>
+
+<p><code>recall@1</code>에 대해서는 TFIDF model과 성능이 비슷하지만, <code>recall@2</code> 과 <code>recall@5</code>는 매우 성능이 좋다. 뉴럴 네트워크가 정답에 높은 점수를 준다는 것이다. 원논문에서는 <code>recall@1</code>, <code>recall@2</code>, 과 <code>recall@5</code>에 대해서 각각 0.55, 0.72 와 0.92를 보고 했다. 하지만 그와 같은 높은 점수는 만들 수 없었다. 아마도 추가적인 전처리와 하이퍼파라메터 최적화가 점수를 올릴수 있을 것이다.</p>
+
+
+
+<h5 id="making-predictions">MAKING PREDICTIONS</h5>
+
+<p><a href="https://github.com/dennybritz/chatbot-retrieval/blob/master/udc_predict.py">udc_predict.py</a>를 여태 보지 않았던 데이터에 대해서 예측할 수 있도록 고칠수 있다. 예를 들어 <code>python udc_predict.py --model_dir=./runs/1467576365/</code> 출력</p>
+
+
+
+<pre class="prettyprint"><code class=" hljs vhdl"><span class="hljs-keyword">Context</span>: Example <span class="hljs-keyword">context</span>
+Response <span class="hljs-number">1</span>: <span class="hljs-number">0.44806</span>
+Response <span class="hljs-number">2</span>: <span class="hljs-number">0.481638</span></code></pre>
+
+<p>You could imagine feeding in 100 potential responses to a context and then picking the one with the highest score.</p>
+
+
+
+<h5 id="conclusion">CONCLUSION</h5>
+
+<p>이 포스트에서 대화 문맥이 주어졌을때, 잠재 응답에 점수를 매기는 retrieval-based neural network model를 구현했다. 아직까지 발전시킬 여지는 많지만, 다른 뉴럴 네트워크가 dual LSTM encoder보다 더 성능이 좋을 것으로 예측할 수있다. hyperparameter 튜닝, 전처리에 대해서도 발전여지가 있다.  <a href="https://github.com/dennybritz/chatbot-retrieval/">전체코드는 깃헙에 있고 확인할 수 있다.</a>.</p>
