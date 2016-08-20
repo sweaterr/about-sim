@@ -24,7 +24,7 @@
 ### Convolutional neural networks
 * [콘볼루션 넷: 모듈 관점 (Conv Nets: A Modular Perspective)](http://blog.naver.com/rupy400/220788125109)  
 * [IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW (한글 번역)](http://blog.naver.com/rupy400/220777178142) 
-* [자연어 처리 문제를 해결하는 CONVOLUTIONAL NEURAL NETWORKS 이해하기](http://blog.naver.com/rupy400/220776488979)  
+* [자연어 처리 문제를 해결하는 CONVOLUTIONAL NEURAL NETWORKS 이해하기](https://kyulabs.wordpress.com/2016/08/20/understanding-convolutional-neural-networks-for-nlp%ED%95%9C%EA%B8%80%EB%B2%88%EC%97%AD/)  
 
 
 ### Recurrent neural networks
