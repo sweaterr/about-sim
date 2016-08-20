@@ -1,7 +1,5 @@
 다음 [포스트](http://www.wildml.com/2015/11/understanding-convolutional-neural-networks-for-nlp/)를, 좀 더 자세히 읽으려는 공부목적으로 번역해보았습니다. 
 
-# UNDERSTANDING CONVOLUTIONAL NEURAL NETWORKS FOR NLP
-
 Convolutional Neural Network (CNNs)에 대해서 들었을 때, 일반적으로 컴퓨터 비전을 생각한다. CNNs은 페이스북의 자동 포토 태깅부터 자율 주행차까지 이미지 분류와 대부분의 컴퓨터 비전 시스템의 혁명을 책임 졌다. 
 
 최근엔, CNNs이 자연어처리에 적용되기 시작해서 재밌는 결과를 얻고 있다. 이 포스트에서는 CNN이 NLP에서 어떻게 쓰이고 있는지 요약할 것이다. CNNs에 숨겨진 직관은 컴퓨터 비전 use case에서는 이해하기가 쉽다. 그래서 거기서부터 시작하고 천천히 NLP로 넘어가겠다.
