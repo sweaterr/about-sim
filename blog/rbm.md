@@ -103,18 +103,114 @@ node?  forward pass에서 RBM이 자신에서 묻는 질문은: 이러한 픽셀
 ## Multiple Layers
 
 Once this RBM learns the structure of the input data as it relates to the activations of the first hidden layer, then the data is passed one layer down the net. 
-이 RBM이 입력 데이터의 구조를 학습하면, 첫번째 은닉층의 활성
 
-Your first hidden layer takes on the role of visible layer. The activations now effectively become your input, and they are multiplied by weights at the nodes of the second hidden layer, to produce another set of activations.
+첫번째 은닉층은 이제 가시층의 역할을 떠맡는다. 활성은 지금 효과적으로 입력이 됐고, 두번째 은닉층의 노드에서 가중치와 곱해져서, 다른 활성을 만든다.
 
-This process of creating sequential sets of activations by grouping features and then grouping groups of features is the basis of a feature hierarchy, by which neural networks learn more complex and abstract representations of data.
+피쳐를 그룹핑하고 피쳐의 그룹을 다시 그룹핑함으로써 활성의 순서 집합을 만드는 과정은 피쳐 계층의 기초다. 이는 뉴럴넷이 좀 더 복잡하고 추상적인 데이터의 표현을 학습하게 한다.
 
-With each new hidden layer, the weights are adjusted until that layer is able to approximate the input from the previous layer. This is greedy, layerwise and unsupervised pre-training. It requires no labels to improve the weights of the network, which means you can train on unlabeled data, untouched by human hands, which is the vast majority of data in the world. As a rule, algorithms exposed to more data produce more accurate results, and this is one of the reasons why deep-learning algorithms are kicking butt.
+각 새로운 은닉층에서,  그 층이 이전층의 입력을 근사할수 있게 가중치는 조절된다. 이는 greedy하고, layerwise한 비지도 사전학습<sup>pre-training</sup>이다. 네트워크의 가중치를 향상시킬 레이블을 요구하지 않는다.
 
-Because those weights already approximate the features of the data, they are well positioned to learn better when, in a second step, you try to classify images with the deep-belief network in a subsequent supervised learning stage.
+보통, 알고리즘은 많은 데이터를 볼수록 좀더 나은 결과를 내놓는다.  그리고 이는 딥러닝 알고리즘이 우월한 이유 중에 하나이다.
 
-While RBMs have many uses, proper initialization of weights to facilitate later learning and classification is one of their chief advantages. In a sense, they accomplish something similar to backpropagation: they push weights to model data well. You could say that pre-training and backprop are substitutable means to the same end.
+그러한 가중치는 이미 데이터의 피쳐를 근사하므로, 이미 학습이 잘 되도록 잘 위치하여 있다. 그래서, 두번째 단계에서,deep-belief network으로 이미지를 더 잘 분류할 수 있다. 
 
-To synthesize restricted Boltzmann machines in one diagram, here is a symmetrical bipartite and bidirectional graph:
+RBMs은 많은 쓰임새가 있지만, 이후의 학습과 분류를 잘하게 만드는 가중치의 적절한 초기화는 그들의 주요 장점 중 하나이다. 그러한 점에서, 역전파<sup>backpropagation</sup>와 비슷한 효과가 있다: RBM과 역전파는 가중치가 데이터를 잘 모델링하도록 한다. You could say that pre-training and backprop are substitutable means to the same end.
+
+restricted Boltzmann machines를 대칭 이분, 양방향 그래프로 다음 한그림에 그렸다.
+![enter image description here](http://deeplearning4j.org/img/sym_bipartite_graph_RBM.png)
+For those interested in studying the structure of RBMs in greater depth, they are one type of [directional, acyclic graph (DAG)](https://en.wikipedia.org/wiki/Directed_acyclic_graph).
+
+## Code Sample: Initiating an RBM on Iris With DL4J
+Note how, below, an RBM is simply created as a layer in a `NeuralNetConfiguration`, a parameter fed into a more general class. Likewise, the RBM object is used to store properties like the transforms applied to the visible and hidden layers, Gaussian and Rectified Linear transforms, respectively.
+
+```java
+public class RBMIrisExample {		
+
+ private static Logger log = LoggerFactory.getLogger(RBMIrisExample.class);		
+
+ public static void main(String[] args) throws IOException {		
+     // Customizing params		
+     Nd4j.MAX_SLICES_TO_PRINT = -1;		
+     Nd4j.MAX_ELEMENTS_PER_SLICE = -1;		
+     Nd4j.ENFORCE_NUMERICAL_STABILITY = true;		
+     final int numRows = 4;		
+     final int numColumns = 1;		
+     int outputNum = 10;		
+     int numSamples = 150;		
+     int batchSize = 150;		
+     int iterations = 100;		
+     int seed = 123;		
+     int listenerFreq = iterations/2;		
+
+     log.info("Load data....");		
+     DataSetIterator iter = new IrisDataSetIterator(batchSize, numSamples);		
+     // Loads data into generator and format consumable for NN		
+     DataSet iris = iter.next();		
+
+     iris.normalizeZeroMeanZeroUnitVariance();		
+
+     log.info("Build model....");		
+     NeuralNetConfiguration conf = new NeuralNetConfiguration.Builder().regularization(true)		
+             .miniBatch(true)		
+             // Gaussian for visible; Rectified for hidden		
+             // Set contrastive divergence to 1		
+             .layer(new RBM.Builder().l2(1e-1).l1(1e-3)		
+                     .nIn(numRows * numColumns) // Input nodes		
+                     .nOut(outputNum) // Output nodes		
+                     .activation("relu") // Activation function type		
+                     .weightInit(WeightInit.RELU) // Weight initialization		
+                     .lossFunction(LossFunctions.LossFunction.RECONSTRUCTION_CROSSENTROPY).k(3)		
+                     .hiddenUnit(HiddenUnit.RECTIFIED).visibleUnit(VisibleUnit.GAUSSIAN)		
+                     .updater(Updater.ADAGRAD).gradientNormalization(GradientNormalization.ClipL2PerLayer)		
+                     .build())		
+             .seed(seed) // Locks in weight initialization for tuning		
+             .iterations(iterations)		
+             .learningRate(1e-3) // Backprop step size		
+             // Speed of modifying learning rate		
+             .optimizationAlgo(OptimizationAlgorithm.LBFGS)		
+                     // ^^ Calculates gradients		
+             .build();		
+     Layer model = LayerFactories.getFactory(conf.getLayer()).create(conf);		
+     model.setListeners(new ScoreIterationListener(listenerFreq));		
+
+     log.info("Evaluate weights....");		
+     INDArray w = model.getParam(DefaultParamInitializer.WEIGHT_KEY);		
+     log.info("Weights: " + w);		
+     log.info("Scaling the dataset");		
+     iris.scale();		
+     log.info("Train model....");		
+     for(int i = 0; i < 20; i++) {		
+         log.info("Epoch "+i+":");		
+         model.fit(iris.getFeatureMatrix());		
+     }		
+ }		
+ // A single layer learns features unsupervised.
+}
+```
+This is an example of an RBM processing the Iris flower dataset.
+
+## Parameters & k
+The variable k is the number of times you run contrastive divergence. Contrastive divergence is the method used to calculate the gradient (the slope representing the relationship between a network’s weights and its error), without which no learning can occur.
+
+Each time contrastive divergence is run, it’s a sample of the Markov Chain composing the restricted Boltzmann machine. A typical value is 1.
+
+In the above example, you can see how RBMs can be created as layers with a more general MultiLayerConfiguration. After each dot you’ll find an additional parameter that affects the structure and performance of a deep neural net. Most of those parameters are defined on this site.
+
+weightInit, or weightInitialization represents the starting value of the coefficients that amplify or mute the input signal coming into each node. Proper weight initialization can save you a lot of training time, because training a net is nothing more than adjusting the coefficients to transmit the best signals, which allow the net to classify accurately.
+
+activationFunction refers to one of a set of functions that determine the threshold(s) at each node above which a signal is passed through the node, and below which it is blocked. If a node passes the signal through, it is “activated.”
+
+optimizationAlgo refers to the manner by which a neural net minimizes error, or finds a locus of least error, as it adjusts its coefficients step by step. LBFGS, an acronym whose letters each refer to the last names of its multiple inventors, is an optimization algorithm that makes use of second-order derivatives to calculate the slope of gradient along which coefficients are adjusted.
+
+regularization methods such as l2 help fight overfitting in neural nets. Regularization essentially punishes large coefficients, since large coefficients by definition mean the net has learned to pin its results to a few heavily weighted inputs. Overly strong weights can make it difficult to generalize a net’s model when exposed to new data.
+
+VisibleUnit/HiddenUnit refers to the layers of a neural net. The VisibleUnit, or layer, is the layer of nodes where input goes in, and the HiddenUnit is the layer where those inputs are recombined in more complex features. Both units have their own so-called transforms, in this case Gaussian for the visible and Rectified Linear for the hidden, which map the signal coming out of their respective layers onto a new space.
+
+lossFunction is the way you measure error, or the difference between your net’s guesses and the correct labels contained in the test set. Here we use SQUARED_ERROR, which makes all errors positive so they can be summed and backpropagated.
+
+learningRate, like momentum, affects how much the neural net adjusts the coefficients on each iteration as it corrects for error. These two parameters help determine the size of the steps the net takes down the gradient towards a local optimum. A large learning rate will make the net learn fast, and maybe overshoot the optimum. A small learning rate will slow down the learning, which can be inefficient.
+
+
+
 
 
