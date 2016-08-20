@@ -22,8 +22,7 @@ Convolutional Neural Network (CNNs)에 대해서 들었을 때, 일반적으로 
 
 ### 픽셀과 주변 사이의 차이는 가장자리를 찾는다.
 (이것을 직관적으로 이해하기 위해, 각 픽셀을 주변 픽셀과 같은 스무딩된 이미지 부분에서 어떤일이 일어나는지 생각해보자:  더하기는 취소되고 결과값은 0 즉 블랙이 된다. If there’s a sharp edge in intensity, a transition from white to black for example, you get a large difference and a resulting white value)
-![Alt text](./1469965575978.png)
-
+![enter image description here](http://docs.gimp.org/en/images/filters/examples/generic-taj-convmatrix-edge-detect.jpg)
 [GIMP](http://docs.gimp.org/en/plug-in-convmatrix.html) 메뉴얼에 다른 예제들이 있다.
 
 To understand more about how convolutions work I also recommend checking out Chris Olah’s post on the topic.
