@@ -80,21 +80,54 @@ Likewise, if you start from Market in San Francisco, even if you don’t know yo
 
 ### Markov Chains
 
-RBMs tie all their nodes together in an algorithm called a Markov Chain. Markov Chains are essentially logical circuits that connect two or more states via probabilities. A sequence of coin flips, a series of die rolls, [Rozencrantz and Guildenstern marching toward their fate](https://en.wikipedia.org/wiki/Rosencrantz_and_Guildenstern_Are_Dead).
-
+RBMs tie all their nodes together in an algorithm called a Markov Chain. 
+RBM은 모든 노드를 묶는다 / 마르코프 체인이라는 알고리즘으로
+Markov Chains are essentially logical circuits that connect two or more states via probabilities. 
+마르코프 체인은 논리적인 회로이다 / 두 개 또는 그 이상의 상태를 연결하는 / 확률로써
+A sequence of coin flips, a series of die rolls, [Rozencrantz and Guildenstern marching toward their fate](https://en.wikipedia.org/wiki/Rosencrantz_and_Guildenstern_Are_Dead).
+동전 던지기의 순서 / 주사위 던지기의 연속 / 
 
 Let’s explore this idea with another absurdly long analogy.
+이 생각을 탐험하자 / 다른 터무니 없이 긴 비유로
 
-We’ll imagine a universe where you have three possible locations, or states, which we’ll call home, office and bowling alley. Those three states are linked by probabilities, which represent the likelihood that you’ll move from one to the other.
+We’ll imagine a universe where you have three possible locations, or states, which we’ll call home, office and bowling alley. 
+우주를 상상할 것이다 / 세가지 가능한 위치가 있는 / 또는 상태 / 집, 사무실 그리고 볼링장이라 부를 것이다
+Those three states are linked by probabilities, which represent the likelihood that you’ll move from one to the other.
+그러한 세가지 상태는 연결된다 / 확률에 의해 / 가능성을 표현하는 / 너가 움직일 / 하나에서 다른 하나로 
 
-At any given moment when you’re home, there is a low probability of you going to the bowling alley, let’s say 10%, a midsize one of going to the office, 40%, and a high one of you remaining where you are, let’s say 50%. The probabilities exiting any one state should always add up to 100%.
+At any given moment when you’re home, there is a low probability of you going to the bowling alley, let’s say 10%, a midsize one of going to the office, 40%, and a high one of you remaining where you are, let’s say 50%. 
+어떠한 주어진 상태에서 / 당신이 집에 있을 때 / 작은 확률이 있다 / 당신이 볼링장을 가는 / 그것을 10%라고 하자 / 사무실로 가는 확률 40% / 그리고 나머지는 그냥 집에 있는 확률 50%
+The probabilities exiting any one state should always add up to 100%.
+확률은 / 어떤 상태로 가는 / 항상 합해서 100%이여야 한다.
 
-Now let’s take the bowling alley: At any given moment while you’re there, there’s a low probability of you remaining amid the beer and slippery shoes, since people don’t bowl for more than a few hours, a low one of going to the office, since work tends to come before bowling, and a high one of you returning home. Let’s make those 20%, 10% and 70%.
+Now let’s take the bowling alley: At any given moment while you’re there, there’s a low probability of you remaining amid the beer and slippery shoes, since people don’t bowl for more than a few hours, a low one of going to the office, since work tends to come before bowling, and a high one of you returning home. 
+볼링장을 취해보자 / 상태가 주어졌을 때 / 당신이 거기 있는 동안 / 작은 확률이 있다 / 당신이 맥주와 슬리퍼를 신고있을 / 사람들은 볼링을 하지 않기 때문이다 / 몇 시간 이상 / 사무실로 가는 것도 낮다 / 왜냐하면 일은 볼링 전에 오는 경향이 있다 / 집에 갈 확률은 높다 / 
+Let’s make those 20%, 10% and 70%.
+그 것들을 20%, 10%  70%라 하자.
 
-So a home state is a fair indication of office state, and a poor indication of bowling alley state. While bowling alley state is a great indicator of home state and a poor indicator of office state. (We’re skipping office state because you get the point.) Each state is in a garden of forking paths, but the paths are not equal.
+So a home state is a fair indication of office state, and a poor indication of bowling alley state. 
+집 상태는 사무실 상태의 좋은 지표이다 / 그리고 볼링장의 나쁜 지표이다.
+While bowling alley state is a great indicator of home state and a poor indicator of office state. 
+볼링장 상태는 집 상태의 좋은 지시자이고 / 사무실 상태의 나쁜 지시자이다
+(We’re skipping office state because you get the point.) 
+사무실 상태는 스킵하고 있다 / 왜냐하면 당신이 요점을 이해했기 때문에
+Each state is in a garden of forking paths, but the paths are not equal.
+각 상태는 / 갈라지는 경로의 정원이다 / 그러나 그 경로는 동일하지 않다.
 
-Markov Chains are sequential. Their purpose is to give you a good idea, given one state, of what the next one will be. Instead of home, office and bowling alley, those states might be edge, intersection and numeral-image, or street, neighborhood and city. Markov Chains are also good for predicting which word is most likely to follow a given wordset (useful in natural-language processing), or which share price is likely to follow a given sequence of share prices (useful in making lots of money).
+Markov Chains are sequential. 
+마르코프 체인은 연속적이다.
+Their purpose is to give you a good idea, given one state, of what the next one will be. 
+그들의 목적은 / 당신에게 좋은 아이디어를 주는 것이다 / 상태가 주어지면 / 다음은 무슨일이 있어나는지
+Instead of home, office and bowling alley, those states might be edge, intersection and numeral-image, or street, neighborhood and city. 
+집 대신에, 사무실과 볼링장, 그러한 상태는 / 가장자리, 교차, 숫자-이미지, 이웃, 도시 일수 있다.
+Markov Chains are also good for predicting which word is most likely to follow a given wordset (useful in natural-language processing), or which share price is likely to follow a given sequence of share prices (useful in making lots of money).
+마르코프 체인은 또한 예측을 잘한다 / 어떤 단어가 올지 / 다음에 / 단어셋이 주어지면 / (자연어 처리에 유용하다) / 또한 어떠한 공유 가격이 올지 / 공유  가격의 순서가 주어졌을 때 / (많은 돈을 버는데 유용하다)
 
-Remember that RBMs are being tested for accuracy against a benchmark dataset, and they record the features that lead them to the correct conclusion. Their job is to learn and adjust the probabilities between the feature-nodes in such a way that if the RBM receives a certain feature, which is a strong indicator of a 5, then the probabilities between nodes lead it to conclude it’s in the presence of a 5. They register which features, feature groups and numeral-images tend to light up together.
+Remember that RBMs are being tested for accuracy against a benchmark dataset, and they record the features that lead them to the correct conclusion.
+RBM은 정확률이 테스트 됨을 기억하라 / 벤치마크 데이터 셋에 대해서 / 그리고 / 그들은 피쳐를 기록한다 / 그들을 이끄는 / 올바른 결론을 이끄는 
+ Their job is to learn and adjust the probabilities between the feature-nodes in such a way that if the RBM receives a certain feature, which is a strong indicator of a 5, then the probabilities between nodes lead it to conclude it’s in the presence of a 5.
+그들의 직업은 학습하는 것이고 / 확률을 조절한다 / 피쳐-노드 사이의 / 그러한 방법으로 / RBM이 특정 피쳐를 받는다면 / 5의 강한 지시자인 / 그러면 노드 사이의 확률은 / 결론을 이끈다 / 그것이 5이라는 
+ They register which features, feature groups and numeral-images tend to light up together.
+ 그들은 등록한다 / 어떤 피쳐, 피쳐 그룹 그리고 숫자-이미지가 같이 환해지는지 
 
 Now, if you’re ready, we’ll show you how to implement a [deep-belief network](http://deeplearning4j.org/deepbeliefnetwork.html).
