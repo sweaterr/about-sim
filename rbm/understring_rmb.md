@@ -78,4 +78,23 @@ If you start from a curve on an 8 (even if you don’t know it’s an 8), the pr
 Likewise, if you start from Market in San Francisco, even if you don’t know you are in San Francisco, you have a high probability of hitting Van Ness at some point, given that the two streets bisect the city and cross each other at the center.
 비슷하게, San Francisco의 Market으로 시작하면, 네가 San Francisco에 있는지 모르더라도 / Van Ness에 도착할 확률이 크다 / 어떤 점에서 / 주어지면 / 두 개의 거리가 도시를 이등분하고 / 서로 교차된다 / 어떤점에서 
 
-Markov Chains
+### Markov Chains
+
+RBMs tie all their nodes together in an algorithm called a Markov Chain. Markov Chains are essentially logical circuits that connect two or more states via probabilities. A sequence of coin flips, a series of die rolls, [Rozencrantz and Guildenstern marching toward their fate](https://en.wikipedia.org/wiki/Rosencrantz_and_Guildenstern_Are_Dead).
+
+
+Let’s explore this idea with another absurdly long analogy.
+
+We’ll imagine a universe where you have three possible locations, or states, which we’ll call home, office and bowling alley. Those three states are linked by probabilities, which represent the likelihood that you’ll move from one to the other.
+
+At any given moment when you’re home, there is a low probability of you going to the bowling alley, let’s say 10%, a midsize one of going to the office, 40%, and a high one of you remaining where you are, let’s say 50%. The probabilities exiting any one state should always add up to 100%.
+
+Now let’s take the bowling alley: At any given moment while you’re there, there’s a low probability of you remaining amid the beer and slippery shoes, since people don’t bowl for more than a few hours, a low one of going to the office, since work tends to come before bowling, and a high one of you returning home. Let’s make those 20%, 10% and 70%.
+
+So a home state is a fair indication of office state, and a poor indication of bowling alley state. While bowling alley state is a great indicator of home state and a poor indicator of office state. (We’re skipping office state because you get the point.) Each state is in a garden of forking paths, but the paths are not equal.
+
+Markov Chains are sequential. Their purpose is to give you a good idea, given one state, of what the next one will be. Instead of home, office and bowling alley, those states might be edge, intersection and numeral-image, or street, neighborhood and city. Markov Chains are also good for predicting which word is most likely to follow a given wordset (useful in natural-language processing), or which share price is likely to follow a given sequence of share prices (useful in making lots of money).
+
+Remember that RBMs are being tested for accuracy against a benchmark dataset, and they record the features that lead them to the correct conclusion. Their job is to learn and adjust the probabilities between the feature-nodes in such a way that if the RBM receives a certain feature, which is a strong indicator of a 5, then the probabilities between nodes lead it to conclude it’s in the presence of a 5. They register which features, feature groups and numeral-images tend to light up together.
+
+Now, if you’re ready, we’ll show you how to implement a [deep-belief network](http://deeplearning4j.org/deepbeliefnetwork.html).
