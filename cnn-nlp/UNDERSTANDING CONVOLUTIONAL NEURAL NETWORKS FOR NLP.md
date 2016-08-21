@@ -23,8 +23,7 @@ Convolutional Neural Network (CNNs)에 대해서 들었을 때, 일반적으로 
 ![enter image description here](http://docs.gimp.org/en/images/filters/examples/generic-taj-convmatrix-edge-detect.jpg)
 [GIMP](http://docs.gimp.org/en/plug-in-convmatrix.html) 메뉴얼에 다른 예제들이 있다.
 
-To understand more about how convolutions work I also recommend checking out Chris Olah’s post on the topic.
-합성곱이 어떻게 동작하는지 좀 더 이해하기 위해서  [ ](http://colah.github.io/posts/2014-07-Understanding-Convolutions/) 를 참고하기를 추천한다.
+합성곱이 어떻게 동작하는지 좀 더 이해하기 위해서  [다음](http://colah.github.io/posts/2014-07-Understanding-Convolutions/) 를 참고하기를 추천한다.
 
 ### WHAT ARE CONVOLUTIONAL NEURAL NETWORKS?
 이제 합성곱은 알았다 , CNNs은 어떤가? CNNs은 기본적으로  몇개의 convolutions 층을 가지고, 층의 출력에 비선형 활성화 함수(ReLU or tanh)를 적용한다. 전통적 피드 포워드 네트워크에서는 각 입력 뉴런을 다름 층의 출력 뉴런에 연결한다. 그것은 완전 연결 층 또는 아핀 층이라고 불린다. CNNs에서는 그것을 하지 않는다. 대신,  출력을 계산하기 위해, 입력층에 합성곱을 사용한다. 이는  입력의 각 지역은 출력에 있는 뉴런에 연결된 지역연결을 야기한다. 각 층은 일반적으로 몇백 또는 몇천 개의 다른 필터를 적용하는데, 위에서 봤듯이, 그 결과는 합쳐진다. 또한 pooling(subsampling) 층이라고 불리는 어떤 것이 있다. 그러나 이는 나중에 다룰 것이다. 학습시간에는, CNN는 수행하길 원하는 작업에 기반한 **필터의 값을 자동적으로 학습**한다. 예를 들어, 이미지 분류에서, CNN은 첫번째 층에서  원본 픽셀에서 가장자리를 찾는 것을 학습할 수 있다. 그 후 두번째 층에서 그 가장자리를 사용해서 간단한 모양을 찾아낸다. 그 후 좀 더 높은 수준의 피쳐를 찾기 위해 이 모양을 이용한다. 예를 들어 얼굴 모양 같은 것이 그것이다. 마지막 층에서는, 이런 고수준 특성을 사용해서 분류한다.
