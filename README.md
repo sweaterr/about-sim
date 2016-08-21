@@ -50,3 +50,6 @@
 ### tensorflow
 * [Large-Scale Machine Learning on Heterogeneous Distributed Systems](http://download.tensorflow.org/paper/whitepaper2015.pdf)
 * https://github.com/aymericdamien/TensorFlow-Examples
+
+### distributed system
+* [Large Scale Distributed Deep Networks](https://static.googleusercontent.com/media/research.google.com/en//archive/large_deep_networks_nips2012.pdf)
