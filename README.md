@@ -34,6 +34,17 @@
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
 
+### deeplearning4j
+* [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
+* [Deeplearning4j 퀵스타트 가이드](http://deeplearning4j.org/kr-quickstart)
+* [아이겐벡터, 공분산, 주성분분석(PCA), 엔트로피의 기초](http://deeplearning4j.org/kr-eigenvector)
+* [심층 신경망 (딥 뉴럴넷) 소개](http://deeplearning4j.org/kr-neuralnet-overview.html)
+* [컨볼루션 신경망(뉴럴 네트워크)](http://deeplearning4j.org/kr-convolutionnets)
+* [LSTM 자세한 튜토리알!](http://deeplearning4j.org/kr-lstm.html) 
+* [Deeplearning4j의 RNN 모델 사용방법](http://deeplearning4j.org/kr-usingrnns.html)
+* [자연어처리 : word2vec](http://deeplearning4j.org/kr-word2vec)
+* [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
+
 ### tensorflow
 * [Large-Scale Machine Learning on Heterogeneous Distributed Systems](http://download.tensorflow.org/paper/whitepaper2015.pdf)
 * https://github.com/aymericdamien/TensorFlow-Examples
