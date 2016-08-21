@@ -33,6 +33,7 @@
 
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
+* [RBM 이해하기](https://kyulabs.wordpress.com/2016/08/21/rbm-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/)
 
 ### deeplearning4j
 * [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
