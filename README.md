@@ -30,6 +30,7 @@
 ### Recurrent neural networks
 * [Recurrent neural network based language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf)
 * [EXTENSIONS OF RECURRENT NEURAL NETWORK LANGUAGE MODEL](http://www.fit.vutbr.cz/research/groups/speech/publi/2011/mikolov_icassp2011_5528.pdf) 
+* [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 튜토리얼](https://kyulabs.blogspot.kr/2016/08/blog-post_26.html)
