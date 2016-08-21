@@ -25,16 +25,16 @@
 ### Convolutional neural networks
 * [콘볼루션 넷: 모듈 관점 (Conv Nets: A Modular Perspective)](http://blog.naver.com/rupy400/220788125109)  
 * [IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW (한글 번역)](http://blog.naver.com/rupy400/220777178142) 
-* [자연어 처리 문제를 해결하는 CONVOLUTIONAL NEURAL NETWORKS 이해하기](https://kyulabs.wordpress.com/2016/08/20/understanding-convolutional-neural-networks-for-nlp%ED%95%9C%EA%B8%80%EB%B2%88%EC%97%AD/)  
+* [자연어 처리 문제를 해결하는 CONVOLUTIONAL NEURAL NETWORKS 이해하기](https://kyulabs.blogspot.kr/2016/08/convolutional-neural-networks.html)  
 
 ### Recurrent neural networks
 * [Recurrent neural network based language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf)
 * [EXTENSIONS OF RECURRENT NEURAL NETWORK LANGUAGE MODEL](http://www.fit.vutbr.cz/research/groups/speech/publi/2011/mikolov_icassp2011_5528.pdf) 
 
 ### Restricted Boltzmann Machines
-* [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
-* [RBM 이해하기](https://kyulabs.wordpress.com/2016/08/21/rbm-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/)
-* [딥 오토인코더](https://kyulabs.wordpress.com/2016/08/21/%EB%94%A5-%EC%98%A4%ED%86%A0%EC%9D%B8%EC%BD%94%EB%8D%94/)
+* [제한 볼츠만 머신 초보자 튜토리얼](https://kyulabs.blogspot.kr/2016/08/blog-post_26.html)
+* [RBM 이해하기](https://kyulabs.blogspot.kr/2016/08/rbm.html)
+* [딥 오토인코더](https://kyulabs.blogspot.kr/2016/08/blog-post_14.html)
 
 ### deeplearning4j
 * [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
