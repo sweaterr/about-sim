@@ -34,6 +34,7 @@
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
 * [RBM 이해하기](https://kyulabs.wordpress.com/2016/08/21/rbm-%EC%9D%B4%ED%95%B4%ED%95%98%EA%B8%B0/)
+* [딥 오토인코더](https://kyulabs.wordpress.com/2016/08/21/%EB%94%A5-%EC%98%A4%ED%86%A0%EC%9D%B8%EC%BD%94%EB%8D%94/)
 
 ### deeplearning4j
 * [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
@@ -45,6 +46,7 @@
 * [Deeplearning4j의 RNN 모델 사용방법](http://deeplearning4j.org/kr-usingrnns.html)
 * [자연어처리 : word2vec](http://deeplearning4j.org/kr-word2vec)
 * [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
+* [딥 오토인코더](https://kyulabs.wordpress.com/2016/08/21/%EB%94%A5-%EC%98%A4%ED%86%A0%EC%9D%B8%EC%BD%94%EB%8D%94/)
 
 ### tensorflow
 * [Large-Scale Machine Learning on Heterogeneous Distributed Systems](http://download.tensorflow.org/paper/whitepaper2015.pdf)
