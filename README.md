@@ -26,7 +26,6 @@
 * [IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW (한글 번역)](http://blog.naver.com/rupy400/220777178142) 
 * [자연어 처리 문제를 해결하는 CONVOLUTIONAL NEURAL NETWORKS 이해하기](https://kyulabs.wordpress.com/2016/08/20/understanding-convolutional-neural-networks-for-nlp%ED%95%9C%EA%B8%80%EB%B2%88%EC%97%AD/)  
 
-
 ### Recurrent neural networks
 * [Recurrent neural network based language model](http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf)
 * [EXTENSIONS OF RECURRENT NEURAL NETWORK LANGUAGE MODEL](http://www.fit.vutbr.cz/research/groups/speech/publi/2011/mikolov_icassp2011_5528.pdf) 
