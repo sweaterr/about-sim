@@ -1,4 +1,6 @@
 
+[원문](http://deeplearning4j.org/understandingRBMs.html)
+
 Restricted Boltzmann machines은 뉴럴넷 르네상스뿐만 아니라, 딥러닝 넷의 심장이다. 그래서 RBM의 메카니즘은 주목할 필요가 있다.
 
 RBM이 동작하는 과정을 공략하기 위해, MNIST의 예제를 사용할 것이다. MNIST는 0에서 9까지 손으로 쓴 숫자 이미지 모음이고, RBMs는 그 이미지를 인식하고 분류할 것이다
