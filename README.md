@@ -32,6 +32,8 @@
 * [EXTENSIONS OF RECURRENT NEURAL NETWORK LANGUAGE MODEL](http://www.fit.vutbr.cz/research/groups/speech/publi/2011/mikolov_icassp2011_5528.pdf) 
 * [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 * [RNNS IN TENSORFLOW, A PRACTICAL GUIDE AND UNDOCUMENTED FEATURES](http://www.wildml.com/2016/08/rnns-in-tensorflow-a-practical-guide-and-undocumented-features/)
+* [Understanding LSTM Networks](https://colah.github.io/posts/2015-08-Understanding-LSTMs/)
+  * 한글번역 http://www.whydsp.org/280
 
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 튜토리얼](http://blog.naver.com/rupy400/220793514761)
