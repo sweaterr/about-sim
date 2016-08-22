@@ -33,7 +33,7 @@
 * [The Unreasonable Effectiveness of Recurrent Neural Networks](http://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 
 ### Restricted Boltzmann Machines
-* [제한 볼츠만 머신 초보자 튜토리얼](https://kyulabs.blogspot.kr/2016/08/blog-post_26.html)
+* [제한 볼츠만 머신 초보자 튜토리얼](http://blog.naver.com/rupy400/220793514761)
 * [RBM 이해하기](https://kyulabs.blogspot.kr/2016/08/rbm.html)
 * [딥 오토인코더](https://kyulabs.blogspot.kr/2016/08/blog-post_14.html)
 
@@ -46,7 +46,7 @@
 * [LSTM 자세한 튜토리알!](http://deeplearning4j.org/kr-lstm.html) 
 * [Deeplearning4j의 RNN 모델 사용방법](http://deeplearning4j.org/kr-usingrnns.html)
 * [자연어처리 : word2vec](http://deeplearning4j.org/kr-word2vec)
-* [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
+* [제한 볼츠만 머신 초보자 메뉴얼](http://blog.naver.com/rupy400/220793514761)
 * [딥 오토인코더](https://kyulabs.wordpress.com/2016/08/21/%EB%94%A5-%EC%98%A4%ED%86%A0%EC%9D%B8%EC%BD%94%EB%8D%94/)
 
 ### tensorflow
