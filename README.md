@@ -39,6 +39,7 @@
 * [제한 볼츠만 머신 초보자 튜토리얼](http://blog.naver.com/rupy400/220793514761)
 * [RBM 이해하기](https://kyulabs.blogspot.kr/2016/08/rbm.html)
 * [딥 오토인코더](https://kyulabs.blogspot.kr/2016/08/blog-post_14.html)
+* [Autoencoder vs RBM (+ vs CNN)](http://khanrc.tistory.com/entry/Autoencoder-vs-RBM-vs-CNN)
 
 ### deeplearning4j
 * [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
