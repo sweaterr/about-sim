@@ -1,4 +1,5 @@
 ## word2vec Parameter Learning Explained
+![image](https://cloud.githubusercontent.com/assets/1518919/17956311/dde3f00a-6ac3-11e6-9516-2503e3fe3ada.png)
 $$
 \mathbf{h} =\mathbf{W}^T\mathbf{x}= \mathbf{W}^T_{k,\cdot}=\mathbf{v}^T_{w_I}
 $$
@@ -24,3 +25,6 @@ $$
 \mathbf{h}  = \frac{1}{C}\mathbf{W}^T(\mathbf{x_1} + \mathbf{x_2} + ... + \mathbf{x_C}) \\
   = \frac{1}{C}(\mathbf{v}_{w_1} + \mathbf{v}_{w_2} + ... + \mathbf{v}_{w_C})
 $$
+
+#### Reference
+* [word2vec Parameter Learning Explained](http://www-personal.umich.edu/~ronxin/pdf/w2vexp.pdf)
