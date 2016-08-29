@@ -45,7 +45,7 @@ Again this is certainly a bit naive since we are only concerning ourselves with 
 But again, this would require computing and storing global information about a massive dataset.
 
 Now that we understand how we can think about a sequence of tokens having a probability, let us observe some example models that could learn these probabilities.
-
+ 
 ### Continuous Bag of Words Model (CBOW)
 One approach is to treat {"The", "cat", ’over", "the’, "puddle"} as a context and from these words, be able to predict or generate the center word "jumped". 
 
@@ -167,9 +167,55 @@ For every training step, instead of looping over the entire vocabulary, we can j
 We "sample" from a noise distribution ($P_n(w)$) whose probabilities match the ordering of the frequency of the vocabulary. 
 
 To augment our formulation of the problem to incorporate Negative Sampling, all we need to do is update the:
+
 • objective function
 • gradients
 • update rules
+
+Mikolov et al. present Negative Sampling in Distributed Representations of Words and Phrases and their Compositionality. 
+
+While negative sampling is based on the Skip-Gram model, it is in fact optimizing a different objective.
+
+Consider a pair $(w, c)$ of word and context. 
+
+Did this pair come from the training data? 
+
+Let’s denote by $P(D = 1|w, c)$ the probability that $(w, c)$ came from the corpus data.
+
+Correspondingly, $P(D = 0|w, c)$ will be the probability that (w, c) did not come from the corpus data. 
+
+First, let’s model $P(D = 1|w, c)$ with the sigmoid function:
+![image](https://cloud.githubusercontent.com/assets/1518919/18033875/4e30e64a-6d69-11e6-8295-13fa1f4c6dc6.png)
+
+Now, we build a new objective function that tries to maximize the probability of a word and context being in the corpus data if it indeed is, and maximize the probability of a word and context not being in the corpus data if it indeed is not. 
+
+We take a simple maximum likelihood approach of these two probabilities. 
+
+(Here we take $\theta$ to be the parameters of the model, and in our case it is $\mathcal{V}$ and $\mathcal{U}$.)
+
+![image](https://cloud.githubusercontent.com/assets/1518919/18033925/9d070d3e-6d6a-11e6-94d1-f46a06891886.png)
+
+Note that $\tilde {D} $ is a "false" or "negative" corpus. 
+
+Where we would have sentences like "stock boil fish is toy". 
+
+Unnatural sentences that should get a low probability of ever occurring. 
+
+We can generate $\tilde {D} $  on the fly by randomly sampling this negative from the word bank. 
+
+Our new objective function would then be:
+![image](https://cloud.githubusercontent.com/assets/1518919/18033997/7f1ee470-6d6c-11e6-8b76-6d1ee2e72663.png)
+In the above formulation,$\{\tilde{u}_k|k = 1 . . . K\}$ are sampled from $P_n(w)$.
+
+Let’s discuss what $P_n(w)$ should be. 
+
+While there is much discussion of what makes the best approximation, what seems to work best is the Unigram Model raised to the power of 3/4. 
+
+Why 3/4? 
+
+Here’s an example that might help gain some intuition:
+
+
 
 
 
