@@ -15,7 +15,7 @@ $$
 \text{grad}( f(a))\cdot \mathbf v = |\text{grad}( f(a))|| \mathbf v|\text{cos}(\theta)
 $$
 
-$\mathbf{v}$는 단위벡터이기 때문에 $ |\text{grad}( f(a)) |\text{cos}(\theta)$를 얻을 수 있고 $\cos(\theta)=1$일 때 전체값이 최대가 되므로, $\text{grad}( f(a))$이 $\mathbf {v}$과 방향이 같을 때, 변화율이 최대가 된다. 즉 gradient가 가장 큰 변화율을 가진 방향이다.
+$\mathbf{v}$는 단위벡터이기 때문에 
 
 Reference
 * http://aleph0.clarku.edu/~djoyce/ma131/directional.pdf
