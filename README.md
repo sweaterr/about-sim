@@ -55,6 +55,10 @@
 * [딥 오토인코더](https://kyulabs.blogspot.kr/2016/08/blog-post_14.html)
 * [Autoencoder vs RBM (+ vs CNN)](http://khanrc.tistory.com/entry/Autoencoder-vs-RBM-vs-CNN)
 
+## Vector search 
+* [An Investigation of Practical Approximate
+Nearest Neighbor Algorithms](http://www.cs.cmu.edu/~agray/approxnn.pdf)
+
 ### deeplearning4j
 * [Deeplearning4j 소개](http://deeplearning4j.org/kr-index.html)
 * [Deeplearning4j 퀵스타트 가이드](http://deeplearning4j.org/kr-quickstart)
