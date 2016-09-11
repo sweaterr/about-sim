@@ -12,6 +12,7 @@
 * [세상의 (거의) 모든 머신러닝 문제 공략법](http://keunwoochoi.blogspot.sg/2016/08/blog-post.html)
 * [쉽게쓰여진 MCMC](http://blog.naver.com/rupy400/220775812498)
 * [Optimization: Stochastic Gradient Descent](http://cs231n.github.io/optimization-1/#analytic)] [[note]()]
+* [BackPropagation Through Time](http://ir.hit.edu.cn/~jguo/docs/notes/bptt.pdf)
 
 ### word2vec
 * [딥러닝, NLP, 표현(Deep Learning, NLP, and Representations)](http://blog.naver.com/rupy400/220788129840) 
