@@ -27,6 +27,8 @@
 
 ### Deep Neural Networks
 * [Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/ko//pubs/archive/45530.pdf)
+
+
 ### Convolutional neural networks
 * [콘볼루션 넷: 모듈 관점 (Conv Nets: A Modular Perspective)](http://blog.naver.com/rupy400/220788125109)  
 * [IMPLEMENTING A CNN FOR TEXT CLASSIFICATION IN TENSORFLOW (한글 번역)](http://blog.naver.com/rupy400/220777178142) 
