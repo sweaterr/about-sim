@@ -21,6 +21,7 @@
 * [Distributed Representations of Sentences and Documents](https://cs.stanford.edu/~quocle/paragraph_vector.pdf)
 * [GloVe: Global Vectors for Word Representation](http://nlp.stanford.edu/pubs/glove.pdf)
 * [Improving Word Representations via Global Context and Multiple Word Prototypes](http://www.aclweb.org/anthology/P12-1092)
+* Bag of Tricks for Efficient Text Classification [pdf](https://arxiv.org/pdf/1607.01759v3.pdf) [note](https://www.evernote.com/shard/s29/sh/8c779373-29d7-46f7-aa1d-929feecd3867/8fef8f3a842d2a64b4e16cfa66a3a775)
 
 ### Convolutional neural networks
 * [콘볼루션 넷: 모듈 관점 (Conv Nets: A Modular Perspective)](http://blog.naver.com/rupy400/220788125109)  
