@@ -16,7 +16,7 @@
 ### word2vec
 * [딥러닝, NLP, 표현(Deep Learning, NLP, and Representations)](http://blog.naver.com/rupy400/220788129840) 
 * [woer2vec explained](http://arxiv.org/pdf/1402.3722v1.pdf)
-* [word2vec Parameter Learning Explained](http://www-personal.umich.edu/~ronxin/pdf/w2vexp.pdf)
+* [word2vec Parameter Learning Explained](http://www-personal.umich.edu/~ronxin/pdf/w2vexp.pdf) [[note](https://www.evernote.com/shard/s29/sh/e0af0845-ff9a-485c-a919-2d5d476f0a56/e22b7ece75f76ce8a3e0d469f78ef131)]
 * [Query2Vec: Learning Deep Intentions from Heterogenous Search Logs](http://www.cs.cmu.edu/~dongyeok/papers/query2vec_v0.2.pdf)
 * [Search Retargeting using Directed Query Embeddings](http://astro.temple.edu/~tua95067/grbovic2015wwwA.pdf)
 * [Distributed Representations of Sentences and Documents](https://cs.stanford.edu/~quocle/paragraph_vector.pdf)
