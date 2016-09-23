@@ -34,6 +34,11 @@
 ### Restricted Boltzmann Machines
 * [제한 볼츠만 머신 초보자 메뉴얼](https://kyulabs.wordpress.com/2016/08/20/title/)
 
+### Image Captioning
+* [Show and Tell: image captioning open sourced in TensorFlow
+](https://research.googleblog.com/2016/09/show-and-tell-image-captioning-open.html)
+* [CONNECTING IMAGES AND NATURAL LANGUAGE](http://cs.stanford.edu/people/karpathy/main.pdf)
+
 ### tensorflow
 * [Large-Scale Machine Learning on Heterogeneous Distributed Systems](http://download.tensorflow.org/paper/whitepaper2015.pdf)
 * https://github.com/aymericdamien/TensorFlow-Examples
