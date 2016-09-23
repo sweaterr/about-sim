@@ -26,7 +26,7 @@
 * Bag of Tricks for Efficient Text Classification [pdf](https://arxiv.org/pdf/1607.01759v3.pdf) [note](https://www.evernote.com/shard/s29/sh/8c779373-29d7-46f7-aa1d-929feecd3867/8fef8f3a842d2a64b4e16cfa66a3a775)
 
 ### Deep Neural Networks
-* [Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/ko//pubs/archive/45530.pdf) [[note](https://www.evernote.com/shard/s29/sh/4b34b0c8-0a51-4c1a-bea9-ffd7d5c80f8c/48e109cd29c4f767a68aa3be37584252)]
+* [Deep Neural Networks for YouTube Recommendations](https://static.googleusercontent.com/media/research.google.com/ko//pubs/archive/45530.pdf) [[note](https://www.evernote.com/shard/s29/sh/4b34b0c8-0a51-4c1a-bea9-ffd7d5c80f8c/48e109cd29c4f767a68aa3be37584252)] [[요약](http://keunwoochoi.blogspot.sg/2016/09/deep-neural-networks-for-youtube.html)]
 
 
 ### Convolutional neural networks
