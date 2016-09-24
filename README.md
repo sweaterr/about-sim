@@ -74,6 +74,7 @@ Nearest Neighbor Algorithms](http://www.cs.cmu.edu/~agray/approxnn.pdf)
 ### tensorflow
 * [Large-Scale Machine Learning on Heterogeneous Distributed Systems](http://download.tensorflow.org/paper/whitepaper2015.pdf)
 * https://github.com/aymericdamien/TensorFlow-Examples
+* [Tensorflow for machine intelligence](https://www.evernote.com/shard/s29/sh/3b83f498-3549-48c4-9a40-5119a58c2788/295769c108025ccdf29e7b74b017105c)
 
 ### distributed system
 * [Large Scale Distributed Deep Networks](https://static.googleusercontent.com/media/research.google.com/en//archive/large_deep_networks_nips2012.pdf)
